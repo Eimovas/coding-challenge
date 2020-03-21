@@ -30,10 +30,10 @@ namespace ConstructionLine.CodingChallenge.Tests
             var sw = new Stopwatch();
             sw.Start();
 
-            var options = new SearchOptions
-            {
-                Colors = new List<Color> { Color.Red }
-            };
+            var options = SearchOptions.From(
+                new List<Color> { Color.Red }
+            );
+
 
             var results = _searchEngine.Search(options);
 

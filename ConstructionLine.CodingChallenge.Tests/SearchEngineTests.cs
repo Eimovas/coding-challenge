@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ConstructionLine.CodingChallenge.Tests
 {
     [TestFixture]
-    public class SearchEngineTests : SearchEngineTestsBase
+    public sealed class SearchEngineTests : SearchEngineTestsBase
     {
         [Test]
         public void Test()
@@ -19,17 +19,90 @@ namespace ConstructionLine.CodingChallenge.Tests
 
             var searchEngine = new SearchEngine(shirts);
 
-            var searchOptions = new SearchOptions
-            {
-                Colors = new List<Color> {Color.Red},
-                Sizes = new List<Size> {Size.Small}
-            };
+            var searchOptions = SearchOptions.From(
+                new List<Size> { Size.Small },
+                new List<Color> { Color.Red }
+            );
 
             var results = searchEngine.Search(searchOptions);
 
             AssertResults(results.Shirts, searchOptions);
             AssertSizeCounts(shirts, searchOptions, results.SizeCounts);
             AssertColorCounts(shirts, searchOptions, results.ColorCounts);
+        }
+
+        [TestCaseSource(typeof(SearchEngineTestCases), nameof(SearchEngineTestCases.TestCases))]
+        public void Given_Shirts_When_VariousSearchOptions_Then_ReturnValid(List<Shirt> shirts, SearchOptions searchOptions)
+        {
+            // arrange
+            var sut = new SearchEngine(shirts);
+
+            // act
+            var result = sut.Search(searchOptions);
+
+            // assert
+            AssertResults(result.Shirts, searchOptions);
+            AssertSizeCounts(shirts, searchOptions, result.SizeCounts);
+            AssertColorCounts(shirts, searchOptions, result.ColorCounts);
+        }
+        
+        public sealed class SearchEngineTestCases
+        {
+            public static IEnumerable<TestCaseData> TestCases
+            {
+                get
+                {
+                    yield return new TestCaseData(
+                        new List<Shirt>(),
+                        SearchOptions.Empty()
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
+                        SearchOptions.Empty()
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
+                        SearchOptions.From(
+                            new List<Size>() {Size.Large, Size.Medium, Size.Small},
+                            new List<Color>() {Color.Black, Color.Blue}
+                        )
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
+                        SearchOptions.From(
+                            new List<Size>(),
+                            new List<Color>() {Color.Black, Color.Blue}
+                        )
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
+                        SearchOptions.From(
+                            new List<Size>() {Size.Large, Size.Medium, Size.Small},
+                            new List<Color>()
+                        )
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() { TestShirts.SmallBlue, TestShirts.SmallBlue, TestShirts.SmallBlue, TestShirts.SmallBlue },
+                        SearchOptions.From(
+                            new List<Size>() { Size.Large, Size.Medium, Size.Small },
+                            new List<Color>() { Color.Black, Color.Blue }
+                        )
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() { TestShirts.SmallBlue, TestShirts.SmallRed, TestShirts.SmallBlack, TestShirts.SmallYellow, TestShirts.SmallWhite },
+                        SearchOptions.From(
+                            new List<Size>() { Size.Large, Size.Medium, Size.Small },
+                            new List<Color>() { Color.Black, Color.Blue, Color.White }
+                        )
+                    );
+                }
+            }
         }
     }
 }

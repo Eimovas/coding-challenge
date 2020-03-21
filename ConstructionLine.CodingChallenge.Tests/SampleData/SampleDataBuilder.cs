@@ -14,8 +14,7 @@ namespace ConstructionLine.CodingChallenge.Tests.SampleData
         public SampleDataBuilder(int numberOfShirts)
         {
             _numberOfShirts = numberOfShirts;
-
-        }
+            }
 
 
         public List<Shirt> CreateShirts()
