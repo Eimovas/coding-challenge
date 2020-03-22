@@ -26,8 +26,8 @@ namespace ConstructionLine.CodingChallenge.Tests
                 }
             }
         }
-
-
+        
+        
         protected static void AssertSizeCounts(List<Shirt> shirts, SearchOptions searchOptions, IReadOnlyList<SizeCount> sizeCounts)
         {
             Assert.That(sizeCounts, Is.Not.Null);
@@ -41,8 +41,8 @@ namespace ConstructionLine.CodingChallenge.Tests
                     .Count(s => s.Size.Id == size.Id
                                 && (!searchOptions.Sizes.Any() ||  searchOptions.Sizes.Contains(s.Size))
                                 && (!searchOptions.Colors.Any() || searchOptions.Colors.Select(c => c.Id).Contains(s.Color.Id)));
-
-                Assert.That(sizeCount.Count, Is.EqualTo(expectedSizeCount), 
+                
+                Assert.That(sizeCount.Count, Is.EqualTo(expectedSizeCount),
                     $"Size count for '{sizeCount.Size.Name}' showing '{sizeCount.Count}' should be '{expectedSizeCount}'");
             }
         }

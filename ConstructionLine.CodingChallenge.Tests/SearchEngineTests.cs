@@ -32,7 +32,8 @@ namespace ConstructionLine.CodingChallenge.Tests
         }
 
         [TestCaseSource(typeof(SearchEngineTestCases), nameof(SearchEngineTestCases.TestCases))]
-        public void Given_Shirts_When_VariousSearchOptions_Then_ReturnValid(List<Shirt> shirts, SearchOptions searchOptions)
+        public void Given_Shirts_When_VariousSearchOptions_Then_ReturnValid(List<Shirt> shirts, SearchOptions searchOptions,
+            SearchResults expected)
         {
             // arrange
             var sut = new SearchEngine(shirts);
@@ -41,9 +42,7 @@ namespace ConstructionLine.CodingChallenge.Tests
             var result = sut.Search(searchOptions);
 
             // assert
-            AssertResults(result.Shirts, searchOptions);
-            AssertSizeCounts(shirts, searchOptions, result.SizeCounts);
-            AssertColorCounts(shirts, searchOptions, result.ColorCounts);
+            CollectionAssert.AreEquivalent(expected.Shirts, result.Shirts);
         }
         
         public sealed class SearchEngineTestCases
@@ -54,12 +53,14 @@ namespace ConstructionLine.CodingChallenge.Tests
                 {
                     yield return new TestCaseData(
                         new List<Shirt>(),
-                        SearchOptions.Empty()
+                        SearchOptions.Empty(),
+                        SearchResults.From(new List<Shirt>())
                     );
 
                     yield return new TestCaseData(
                         new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
-                        SearchOptions.Empty()
+                        SearchOptions.Empty(),
+                        SearchResults.From(new List<Shirt>() { TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow })
                     );
 
                     yield return new TestCaseData(
@@ -67,23 +68,24 @@ namespace ConstructionLine.CodingChallenge.Tests
                         SearchOptions.From(
                             new List<Size>() {Size.Large, Size.Medium, Size.Small},
                             new List<Color>() {Color.Black, Color.Blue}
-                        )
+                        ),
+                        SearchResults.From(new List<Shirt>() { TestShirts.SmallBlue, TestShirts.LargeBlack })
                     );
 
                     yield return new TestCaseData(
                         new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
                         SearchOptions.From(
-                            new List<Size>(),
                             new List<Color>() {Color.Black, Color.Blue}
-                        )
+                        ),
+                        SearchResults.From(new List<Shirt>() { TestShirts.SmallBlue, TestShirts.LargeBlack })
                     );
 
                     yield return new TestCaseData(
                         new List<Shirt>() {TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow },
                         SearchOptions.From(
-                            new List<Size>() {Size.Large, Size.Medium, Size.Small},
-                            new List<Color>()
-                        )
+                            new List<Size>() {Size.Large, Size.Medium, Size.Small}
+                        ),
+                        SearchResults.From(new List<Shirt>() { TestShirts.SmallBlue, TestShirts.MediumRed, TestShirts.LargeBlack, TestShirts.LargeYellow })
                     );
 
                     yield return new TestCaseData(
@@ -91,7 +93,8 @@ namespace ConstructionLine.CodingChallenge.Tests
                         SearchOptions.From(
                             new List<Size>() { Size.Large, Size.Medium, Size.Small },
                             new List<Color>() { Color.Black, Color.Blue }
-                        )
+                        ),
+                        SearchResults.From(new List<Shirt>() { TestShirts.SmallBlue, TestShirts.SmallBlue, TestShirts.SmallBlue, TestShirts.SmallBlue })
                     );
 
                     yield return new TestCaseData(
@@ -99,7 +102,24 @@ namespace ConstructionLine.CodingChallenge.Tests
                         SearchOptions.From(
                             new List<Size>() { Size.Large, Size.Medium, Size.Small },
                             new List<Color>() { Color.Black, Color.Blue, Color.White }
-                        )
+                        ),
+                        SearchResults.From(new List<Shirt>() { TestShirts.SmallBlue, TestShirts.SmallBlack, TestShirts.SmallWhite })
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() { TestShirts.SmallBlue, TestShirts.MediumBlue, TestShirts.LargeBlack },
+                        SearchOptions.From(
+                            new List<Color>() { Color.Red }
+                        ),
+                        SearchResults.From(new List<Shirt>())
+                    );
+
+                    yield return new TestCaseData(
+                        new List<Shirt>() { TestShirts.SmallBlue, TestShirts.MediumRed },
+                        SearchOptions.From(
+                            new List<Size>() { Size.Large }
+                        ),
+                        SearchResults.From(new List<Shirt>())
                     );
                 }
             }
